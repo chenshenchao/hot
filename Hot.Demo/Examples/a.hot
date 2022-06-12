@@ -1,0 +1,16 @@
+﻿mod main;
+
+# import lib;
+
+let test = (c, d) -> {
+	let a = [];
+	let b = {};
+	ret a;
+};
+
+# 主函数
+let main = (args) -> {
+	let a = 123.4;
+	let b = 123.5;
+	ret a + b;
+};

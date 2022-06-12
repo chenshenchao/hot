@@ -1,0 +1,16 @@
+﻿mod other;
+
+use os;
+
+let person =  :: {
+};
+
+let tester = person :: {
+	let name = name;
+	let level = level;
+	
+	let test = () -> {
+		os.println("Hello Test.");
+	};
+
+};

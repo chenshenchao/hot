@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>true</IsPackable>
+		<PackageId>Hot</PackageId>
+		<Version>0.0.1</Version>
+		<Authors>chenshenchao</Authors>
+		<PackageLicenseFile>License</PackageLicenseFile>
+		<PackageReadmeFile>Readme.md</PackageReadmeFile>
+		<PackageIcon>Logo.png</PackageIcon>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>Targets/Binaries/Debug</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>Targets/Binaries/Release</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Targets\**" />
+		<EmbeddedResource Remove="Targets\**" />
+		<Content Remove="Targets\**" />
+		<None Remove="Targets\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../License" Pack="true" PackagePath="/" />
+		<None Include="../Readme.md" Pack="true" PackagePath="/" />
+		<None Include="../Logo.png" Pack="true" PackagePath="/" />
+	</ItemGroup>
+
+</Project>

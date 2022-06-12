@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>Targets/Binaries/Debug</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>Targets/Binaries/Release</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Targets\**" />
+		<EmbeddedResource Remove="Targets\**" />
+		<Content Remove="Targets\**" />
+		<None Remove="Targets\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../License" Pack="true" PackagePath="/" />
+		<None Include="../Readme.md" Pack="true" PackagePath="/" />
+		<None Include="../Logo.png" Pack="true" PackagePath="/" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Hot\Hot.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Examples\a.hot">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Examples\b.hot">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+
+</Project>
