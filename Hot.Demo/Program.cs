@@ -12,6 +12,8 @@ using var lexer = new HotLexer(stream);
 
 using var parser = new HotParser(lexer);
 HotAst tree = parser.Parse();
+var plain = tree.Explain();
+Console.Write(plain);
 
 //var interperter = new HotInterpreter();
 //interperter.Interpret();

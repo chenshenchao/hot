@@ -32,8 +32,13 @@ public class HotAstOperation : HotAst
         return root;
     }
 
-    public override string Explain()
+    public override string Explain(int indent)
     {
-        throw new NotImplementedException();
+        StringBuilder sb = new StringBuilder();
+        sb.Append(string.Join("", new char[indent].Select(_ => ' ')));
+        sb.AppendLine(Operation!.ToString());
+        sb.AppendLine(Left!.Explain(indent + 4));
+        sb.AppendLine(Right!.Explain(indent + 4));
+        return sb.ToString();
     }
 }

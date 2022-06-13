@@ -10,8 +10,13 @@ public class HotAstBlock : HotAst
 {
     public List<HotAst> Statements { get; set; } = new List<HotAst>();
 
-    public override string Explain()
+    public override string Explain(int indent)
     {
-        throw new NotImplementedException();
+        StringBuilder sb = new StringBuilder();
+        foreach (var item in Statements)
+        {
+            sb.Append(item.Explain(indent + 4));
+        }
+        return sb.ToString();
     }
 }

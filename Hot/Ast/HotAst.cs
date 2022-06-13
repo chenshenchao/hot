@@ -8,5 +8,5 @@ namespace Hot.Ast;
 
 public abstract class HotAst
 {
-    public abstract string Explain();
+    public abstract string Explain(int indent=0);
 }

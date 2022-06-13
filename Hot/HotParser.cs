@@ -7,7 +7,7 @@ namespace Hot;
 /// </summary>
 public class HotParser : IDisposable
 {
-    private HotLexer lexer;
+    private HotLexer? lexer;
     private List<HotLexeme> lexemes;
 
     /// <summary>
@@ -214,22 +214,12 @@ public class HotParser : IDisposable
         }
     }
 
-
-
     /// <summary>
-    /// expression ::= 
-    ///     functionDefine
-    ///     operand (('+'|'-'|'*'|'/') operand)*
+    /// operation ::= operand (('+'|'-'|'*'|'/') operand)*
     /// </summary>
     /// <returns></returns>
-    private HotAst MatchExpression()
+    private HotAst MatchOperation()
     {
-        var fn = PeekLexeme();
-        if (fn.Token == HotToken.KeywordFn)
-        {
-            return MatchFunctionDefine();
-        }
-
         var operand = MatchOperand();
         var root = new HotAstOperation();
         root.Left = operand;
@@ -270,6 +260,23 @@ public class HotParser : IDisposable
 
         // TODO 优先级 和 结合性调整
         return HotAstOperation.Adjust(root);
+    }
+
+    /// <summary>
+    /// expression ::= 
+    ///     functionDefine
+    ///     operation
+    /// </summary>
+    /// <returns></returns>
+    private HotAst MatchExpression()
+    {
+        var fn = PeekLexeme();
+        if (fn.Token == HotToken.KeywordFn)
+        {
+            return MatchFunctionDefine();
+        }
+
+        return MatchOperation();
     }
 
     /// <summary>

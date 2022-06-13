@@ -8,12 +8,17 @@ namespace Hot.Ast;
 
 public class HotAstFunctionDefine : HotAst
 {
-    public string? Name { get; set; }
     public List<string>? Parameters { get; set; }
     public HotAstBlock? Body { get; set; }
 
-    public override string Explain()
+    public override string Explain(int indent)
     {
-        throw new NotImplementedException();
+        StringBuilder sb = new StringBuilder();
+        sb.Append(string.Join("", new char[indent].Select(_ => ' ')));
+        sb.Append("[fn](");
+        sb.Append(string.Join(",", Parameters!));
+        sb.AppendLine(") ->");
+        sb.Append(Body!.Explain(indent + 4));
+        return sb.ToString();
     }
 }
