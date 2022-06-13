@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Hot.Ast;
 
-public class HotAstFunctionDefine : HotAst
+public class HotAstModuleDefine : HotAst
 {
-    public string? Name { get; set; }
-    public List<string>? Parameters { get; set; }
-    public HotAstBlock? Body { get; set; }
+    public string Name { get; set; } = null!;
+    public List<HotAst> Body { get; set; } = null!;
 
     public override string Explain()
     {

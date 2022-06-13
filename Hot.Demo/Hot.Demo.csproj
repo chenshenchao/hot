@@ -36,7 +36,7 @@
 	  <None Update="Examples\a.hot">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Examples\b.hot">
+	  <None Update="Examples\lib.hot">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

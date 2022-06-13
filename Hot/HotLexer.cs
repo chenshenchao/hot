@@ -11,11 +11,15 @@ public class HotLexer : IDisposable
 
     private static readonly Dictionary<string, HotToken> keywords = new Dictionary<string, HotToken>()
     {
+        { "mod", HotToken.KeywordMod },
+        { "use", HotToken.KeywordUse },
         { "let", HotToken.KeywordLet },
         { "fn", HotToken.KeywordFn },
         { "ret", HotToken.KeywordRet },
         { "if", HotToken.KeywordIf },
         { "else", HotToken.KeywordElse },
+        { "true", HotToken.KeywordTrue },
+        { "false", HotToken.KeywordFalse },
     };
 
     private StreamReader? reader;

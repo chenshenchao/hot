@@ -10,16 +10,19 @@ public enum HotToken
 {
     EOF = -1,
 
-    Bool,
     Number,
     String,
     Identifier,
 
+    KeywordMod,
+    KeywordUse,
     KeywordLet,
     KeywordFn,
     KeywordRet,
     KeywordIf,
     KeywordElse,
+    KeywordTrue,
+    KeywordFalse,
     
     SignPlus, // +
     SignMinus, // -

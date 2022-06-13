@@ -1,15 +1,15 @@
 ﻿mod main;
 
-# import lib;
+# use lib;
 
-let test = (c, d) -> {
-	let a = [];
-	let b = {};
-	ret a;
+let test = fn (c, d) -> {
+	#let a = [];
+	#let b = {};
+	ret c;
 };
 
 # 主函数
-let main = (args) -> {
+let main = fn (args) -> {
 	let a = 123.4;
 	let b = 123.5;
 	ret a + b;

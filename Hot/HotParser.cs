@@ -5,7 +5,7 @@ namespace Hot;
 /// <summary>
 /// 语法分析器
 /// </summary>
-public class HotParser
+public class HotParser : IDisposable
 {
     private HotLexer lexer;
     private List<HotLexeme> lexemes;
@@ -20,51 +20,116 @@ public class HotParser
         lexemes = new List<HotLexeme>();
     }
 
+    public void Dispose()
+    {
+        if (lexer != null)
+        {
+            lexer.Dispose();
+            lexer = null;
+        }
+    }
+
     public HotAst Parse()
     {
-        return MatchBlock(HotToken.EOF);
+        return MatchModuleDefine();
+    }
+
+    /// <summary>
+    /// moduleDefine ::= 'mod' identifier ';' statement*
+    /// </summary>
+    /// <returns></returns>
+    private HotAstModuleDefine MatchModuleDefine()
+    {
+        Match(HotToken.KeywordMod);
+        var id = Match(HotToken.Identifier);
+        Match(HotToken.SignSemicolon);
+
+        var body = new List<HotAst>();
+        while (true)
+        {
+            HotLexeme lexeme = PeekLexeme();
+            if (lexeme.Token == HotToken.EOF)
+            {
+                break;
+            }
+            body.Add(MatchStatement());
+        }
+
+        return new HotAstModuleDefine
+        {
+            Name = (id.Content as string)!,
+            Body = body,
+        };
     }
 
 
     /// <summary>
-    /// functionDefine ::=
-    ///     fn identifier '(' functionParameters ')' '{' '}'
+    /// functionDefine ::= '(' functionParameters ')' '->' '{' block '}'
     /// </summary>
     /// <returns></returns>
     private HotAstFunctionDefine MatchFunctionDefine()
     {
-        HotAstFunctionDefine result = new HotAstFunctionDefine();
         Match(HotToken.KeywordFn);
-        var lexeme = Match(HotToken.Identifier);
-        result.Name = lexeme.Content as string;
+        // var id = Match(HotToken.Identifier);
+
         Match(HotToken.SignParentheseLeft);
-
-        MatchFunctionParameters();
-
+        var parameters = MatchFunctionParameters();
         Match(HotToken.SignParentheseRight);
-        Match(HotToken.SignBraceLeft);
 
-        Match(HotToken.SignBraceRight);
+        Match(HotToken.SignArrowRight);
+
+        var body = MatchBlock();
+
+        return new HotAstFunctionDefine()
+        {
+            Parameters = parameters,
+            Body = body,
+        };
+    }
+
+    /// <summary>
+    /// functionParameters ::=
+    ///     ε
+    ///     identifier (',' identifier)*
+    /// </summary>
+    /// <returns></returns>
+    private List<string> MatchFunctionParameters()
+    {
+        var result = new List<string>();
+        var lexeme = PeekLexeme();
+        while (lexeme.Token == HotToken.Identifier)
+        {
+            PopLexeme();
+            result.Add((lexeme.Content as string)!);
+            lexeme = PeekLexeme();
+            if (lexeme.Token == HotToken.SignComma)
+            {
+                PopLexeme();
+                lexeme = PeekLexeme();
+            }
+        }
         return result;
     }
 
-    private void MatchFunctionParameters()
+    /// <summary>
+    /// block ::= '{' statement* '}'
+    /// </summary>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    private HotAstBlock MatchBlock()
     {
-
-    }
-
-    private HotAst MatchBlock(HotToken limit)
-    {
+        Match(HotToken.SignBraceLeft);
         var result = new List<HotAst>();
         while (true)
         {
             HotLexeme lexeme = PeekLexeme();
-            if (lexeme.Token == limit)
+            if (lexeme.Token == HotToken.SignBraceRight)
             {
                 break;
             }
             result.Add(MatchStatement());
         }
+        Match(HotToken.SignBraceRight);
         return new HotAstBlock
         {
             Statements = result,
@@ -72,7 +137,7 @@ public class HotParser
     }
 
     /// <summary>
-    /// 
+    /// variableDefine ::= 'let' identifier '=' expression ';'
     /// </summary>
     /// <returns></returns>
     private HotAstVariableDefine MatchVariableDefine()
@@ -89,6 +154,10 @@ public class HotParser
         };
     }
 
+    /// <summary>
+    /// return ::= 'ret' expression ';'
+    /// </summary>
+    /// <returns></returns>
     private HotAstReturn MatchReturn()
     {
         Match(HotToken.KeywordRet);
@@ -100,13 +169,111 @@ public class HotParser
         };
     }
 
+    /// <summary>
+    /// operand ::=
+    ///     true
+    ///     false
+    ///     number
+    ///     string
+    ///     identifier
+    ///     ('-'|'+') (number | identifier)
+    ///     '(' expression ')'
+    /// </summary>
+    /// <returns></returns>
+    private HotAst MatchOperand()
+    {
+        var lexeme = PopLexeme();
+        switch (lexeme.Token)
+        {
+            case HotToken.KeywordFalse:
+            case HotToken.KeywordTrue:
+            case HotToken.Number:
+            case HotToken.String:
+            case HotToken.Identifier:
+                return new HotAstOperand
+                {
+                    Operand = lexeme,
+                };
+            case HotToken.SignPlus:
+            case HotToken.SignMinus:
+                var operand = PopLexeme();
+                return new HotAstOperand
+                {
+                    Sign = lexeme,
+                    Operand = operand,
+                };
+            case HotToken.SignParentheseLeft:
+                var expression = MatchExpression();
+                Match(HotToken.SignParentheseRight);
+                return new HotAstOperand
+                {
+                    Expression= expression,
+                };
+            default:
+                throw new HotException($"语法错误，不是有效的操作数 {lexeme}");
+        }
+    }
+
+
+
+    /// <summary>
+    /// expression ::= 
+    ///     functionDefine
+    ///     operand (('+'|'-'|'*'|'/') operand)*
+    /// </summary>
+    /// <returns></returns>
     private HotAst MatchExpression()
     {
-        return null;
+        var fn = PeekLexeme();
+        if (fn.Token == HotToken.KeywordFn)
+        {
+            return MatchFunctionDefine();
+        }
+
+        var operand = MatchOperand();
+        var root = new HotAstOperation();
+        root.Left = operand;
+    loop:
+        var lexeme = PeekLexeme();
+        switch (lexeme.Token)
+        {
+            case HotToken.SignPlus:
+            case HotToken.SignMinus:
+            case HotToken.SignStar:
+            case HotToken.SignSlash:
+                var operation = PopLexeme();
+                var right = MatchOperand();
+                if (root.Operation is null)
+                {
+                    root.Operation = operation;
+                    root.Right = right;
+                }
+                else
+                {
+                    var left = root.Right;
+                    root.Right = new HotAstOperation
+                    {
+                        Left = left,
+                        Operation = operation,
+                        Right = right,
+                    };
+                }
+                goto loop;
+            default:
+                break;
+        }
+
+        if (root.Operation is null)
+        {
+            return operand;
+        }
+
+        // TODO 优先级 和 结合性调整
+        return HotAstOperation.Adjust(root);
     }
 
     /// <summary>
-    /// 
+    /// assign ::= identifier '=' expression ';'
     /// </summary>
     /// <returns></returns>
     /// <exception cref="HotException"></exception>
@@ -124,7 +291,10 @@ public class HotParser
     }
 
     /// <summary>
-    /// 
+    /// statement ::=
+    ///     variableDefine
+    ///     return
+    ///     assign
     /// </summary>
     /// <returns></returns>
     /// <exception cref="HotException"></exception>
@@ -133,8 +303,6 @@ public class HotParser
         var lexeme = PeekLexeme();
         switch (lexeme.Token)
         {
-            case HotToken.KeywordFn:
-                return MatchFunctionDefine();
             case HotToken.KeywordLet:
                 return MatchVariableDefine();
             case HotToken.KeywordRet:
@@ -146,7 +314,7 @@ public class HotParser
     }
 
     /// <summary>
-    /// 
+    /// 匹配词素
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
@@ -169,7 +337,7 @@ public class HotParser
     {
         if (lexemes.Count > 0)
         {
-            int i = lexemes.Count;
+            int i = lexemes.Count - 1;
             var r = lexemes[i];
             lexemes.RemoveAt(i);
             return r;
