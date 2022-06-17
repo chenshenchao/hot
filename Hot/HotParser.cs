@@ -223,6 +223,7 @@ public class HotParser : IDisposable
         var operand = MatchOperand();
         var root = new HotAstOperation();
         root.Left = operand;
+        var current = root;
     loop:
         var lexeme = PeekLexeme();
         switch (lexeme.Token)
@@ -240,13 +241,16 @@ public class HotParser : IDisposable
                 }
                 else
                 {
-                    var left = root.Right;
-                    root.Right = new HotAstOperation
+                    var one = new HotAstOperation
                     {
-                        Left = left,
+                        Top = current,
                         Operation = operation,
+                        Left = current.Right,
                         Right = right,
                     };
+                    current.Right = one;
+                    root = HotAstOperation.Adjust(one, root);
+                    current = one;
                 }
                 goto loop;
             default:
@@ -259,7 +263,7 @@ public class HotParser : IDisposable
         }
 
         // TODO 优先级 和 结合性调整
-        return HotAstOperation.Adjust(root);
+        return root;
     }
 
     /// <summary>

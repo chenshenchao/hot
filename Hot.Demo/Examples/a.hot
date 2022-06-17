@@ -12,5 +12,5 @@ let test = fn (c, d) -> {
 let main = fn (args) -> {
 	let a = 123.4;
 	let b = 123.5;
-	ret a + b;
+	ret a + b * 1 + 8 * 5 - 9 / 6;
 };

@@ -18,27 +18,66 @@ public class HotAstOperation : HotAst
 
     public static readonly HashSet<HotToken> Rightists = new HashSet<HotToken>();
 
-    public HotLexeme? Operation { get; set; }
+    private HotLexeme? operation = null;
+
+    public HotLexeme? Operation {
+        get => operation;
+        set
+        {
+            operation = value;
+            Level = Priorities[value!.Token];
+            IsRightist = Rightists.Contains(value!.Token);
+        }
+    }
     
+    public HotAstOperation? Top { get; set; }
     public HotAst? Left { get; set; }
     public HotAst? Right { get; set; }
+
+    public int Level { get; private set; }
+    public bool IsRightist { get; private set; }
 
     /// <summary>
     /// 根据优先级和结合性调整
     /// </summary>
-    public static HotAstOperation Adjust(HotAstOperation root)
+    public static HotAstOperation Adjust(HotAstOperation one, HotAstOperation root)
     {
 
+        while (true)
+        {
+            if (one.Top == null)
+            {
+                return one;
+            }
+            if (one.Level < one.Top.Level || (!one.IsRightist && one.Level == one.Top.Level))
+            {
+                var top = one.Top;
+                one.Top = top.Top;
+                top.Top = one;
+                top.Right = one.Left;
+                one.Left = top;
+            }
+            else
+            {
+                break;
+            }
+        }
         return root;
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="indent"></param>
+    /// <returns></returns>
     public override string Explain(int indent)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(string.Join("", new char[indent].Select(_ => ' ')));
         sb.AppendLine(Operation!.ToString());
         sb.AppendLine(Left!.Explain(indent + 4));
-        sb.AppendLine(Right!.Explain(indent + 4));
+        sb.Append(Right!.Explain(indent + 4));
         return sb.ToString();
     }
 }
