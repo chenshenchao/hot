@@ -62,31 +62,6 @@ public class HotParser : IDisposable
         };
     }
 
-
-    /// <summary>
-    /// functionDefine ::= '(' functionParameters ')' '->' '{' block '}'
-    /// </summary>
-    /// <returns></returns>
-    private HotAstFunctionDefine MatchFunctionDefine()
-    {
-        Match(HotToken.KeywordFn);
-        // var id = Match(HotToken.Identifier);
-
-        Match(HotToken.SignParentheseLeft);
-        var parameters = MatchFunctionParameters();
-        Match(HotToken.SignParentheseRight);
-
-        Match(HotToken.SignArrowRight);
-
-        var body = MatchBlock();
-
-        return new HotAstFunctionDefine()
-        {
-            Parameters = parameters,
-            Body = body,
-        };
-    }
-
     /// <summary>
     /// functionParameters ::=
     ///     ε
@@ -109,6 +84,28 @@ public class HotParser : IDisposable
             }
         }
         return result;
+    }
+
+
+    /// <summary>
+    /// functionDefine ::= 'fn' '(' functionParameters ')' '->' '{' block '}'
+    /// </summary>
+    /// <returns></returns>
+    private HotAstFunctionDefine MatchFunctionDefine()
+    {
+        Match(HotToken.KeywordFn);
+
+        var parameters = MatchFunctionParameters();
+
+        Match(HotToken.SignArrowRight);
+
+        var body = MatchBlock();
+
+        return new HotAstFunctionDefine()
+        {
+            Parameters = parameters,
+            Body = body,
+        };
     }
 
     /// <summary>
@@ -274,13 +271,58 @@ public class HotParser : IDisposable
     /// <returns></returns>
     private HotAst MatchExpression()
     {
-        var fn = PeekLexeme();
-        if (fn.Token == HotToken.KeywordFn)
+        var p1 = PeekLexeme();
+        if (p1.Token == HotToken.KeywordFn)
         {
             return MatchFunctionDefine();
         }
+        var p2 = PeekLexeme(2);
+        if (p1.Token == HotToken.Identifier && p2.Token == HotToken.SignParentheseLeft)
+        {
+            return MatchFunctionCall();
+        }
 
         return MatchOperation();
+    }
+
+    /// <summary>
+    /// functionParameters ::=
+    ///     ε
+    ///     expression (',' expression)*
+    /// </summary>
+    /// <returns></returns>
+    private List<HotAst> MatchFunctionArguments()
+    {
+        var result = new List<HotAst>();
+        var lexeme = PeekLexeme();
+        while (lexeme.Token != HotToken.SignParentheseRight)
+        {
+            result.Add(MatchExpression());
+            lexeme = PeekLexeme();
+            if (lexeme.Token == HotToken.SignComma)
+            {
+                PopLexeme();
+                lexeme = PeekLexeme();
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// functionCall ::= identifier '(' functionArguments ')'
+    /// </summary>
+    /// <returns></returns>
+    private HotAst MatchFunctionCall()
+    {
+        var name = Match(HotToken.Identifier);
+        Match(HotToken.SignParentheseLeft);
+        var arguments = MatchFunctionArguments();
+        Match(HotToken.SignParentheseRight);
+        return new HotAstFunctionCall
+        {
+            Name = (name.Content as string)!,
+            Arguments = arguments,
+        };
     }
 
     /// <summary>
@@ -348,12 +390,11 @@ public class HotParser : IDisposable
     {
         if (lexemes.Count > 0)
         {
-            int i = lexemes.Count - 1;
-            var r = lexemes[i];
-            lexemes.RemoveAt(i);
+            var r = lexemes[0];
+            lexemes.RemoveAt(0);
             return r;
         }
-        return lexer.PopLexeme();
+        return lexer!.PopLexeme();
     }
 
     /// <summary>
@@ -365,9 +406,9 @@ public class HotParser : IDisposable
     {
         for(int j = lexemes.Count; j < i; ++j)
         {
-            var lexeme = lexer.PopLexeme();
+            var lexeme = lexer!.PopLexeme();
             lexemes.Add(lexeme);
         }
-        return lexemes[lexemes.Count - i];
+        return lexemes[i - 1];
     }
 }

@@ -9,7 +9,7 @@ let tester = person :: {
 	let name = name;
 	let level = level;
 	
-	let test = () -> {
+	let test = fn -> {
 		os.println("Hello Test.");
 	};
 
