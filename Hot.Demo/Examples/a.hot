@@ -3,8 +3,13 @@
 # use lib;
 
 let test = fn c, d -> {
-	#let a = [];
-	#let b = {};
+	let a = [];
+	let b = {};
+	let e = [1,2,3,10.2 + 4];
+	let f = {
+		key1: 123,
+		key2: [1,2,3,4,5],
+	};
 	ret c / d;
 };
 

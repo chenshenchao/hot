@@ -134,6 +134,69 @@ public class HotParser : IDisposable
     }
 
     /// <summary>
+    /// listDefine ::= '[' expression* ']'
+    /// </summary>
+    /// <returns></returns>
+    private HotAstListDefine MatchListDefine()
+    {
+        Match(HotToken.SignBracketLeft);
+        var items = new List<HotAst>();
+        var lexeme = PeekLexeme();
+        while (lexeme.Token != HotToken.SignBracketRight)
+        {
+            items.Add(MatchExpression());
+            lexeme = PeekLexeme();
+            if (lexeme.Token == HotToken.SignComma)
+            {
+                PopLexeme();
+                lexeme = PeekLexeme();
+            }
+            else
+            {
+                break;
+            }
+        }
+        Match(HotToken.SignBracketRight);
+        return new HotAstListDefine
+        {
+            Items = items,
+        };
+    }
+
+    /// <summary>
+    /// dictionaryDefine ::= '{' ((expression ':' expression) (',' expression ':' expression)*)? '}'
+    /// </summary>
+    /// <returns></returns>
+    private HotAstDictionaryDefine MatchDictionaryDefine()
+    {
+        Match(HotToken.SignBraceLeft);
+        var items = new List<KeyValuePair<HotAst, HotAst>>();
+        var lexeme = PeekLexeme();
+        while (lexeme.Token != HotToken.SignBraceRight)
+        {
+            var key = MatchExpression();
+            Match(HotToken.SignColon);
+            var value = MatchExpression();
+            items.Add(new KeyValuePair<HotAst, HotAst>(key, value));
+            lexeme = PeekLexeme();
+            if (lexeme.Token == HotToken.SignComma)
+            {
+                PopLexeme();
+                lexeme = PeekLexeme();
+            }
+            else
+            {
+                break;
+            }
+        }
+        Match(HotToken.SignBraceRight);
+        return new HotAstDictionaryDefine
+        {
+            Items = items,
+        };
+    }
+
+    /// <summary>
     /// variableDefine ::= 'let' identifier '=' expression ';'
     /// </summary>
     /// <returns></returns>
@@ -276,6 +339,15 @@ public class HotParser : IDisposable
         {
             return MatchFunctionDefine();
         }
+        if (p1.Token == HotToken.SignBracketLeft)
+        {
+            return MatchListDefine();
+        }
+        if (p1.Token == HotToken.SignBraceLeft)
+        {
+            return MatchDictionaryDefine();
+        }
+
         var p2 = PeekLexeme(2);
         if (p1.Token == HotToken.Identifier && p2.Token == HotToken.SignParentheseLeft)
         {

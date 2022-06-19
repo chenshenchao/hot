@@ -7,7 +7,7 @@ namespace Hot;
 /// </summary>
 public class HotLexer : IDisposable
 {
-    private static readonly string signs = "+-*/=,;()[]{}<>";
+    private static readonly string signs = "+-*/=,:;()[]{}<>";
 
     private static readonly Dictionary<string, HotToken> keywords = new Dictionary<string, HotToken>()
     {
