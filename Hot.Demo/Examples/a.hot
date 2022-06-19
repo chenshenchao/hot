@@ -10,7 +10,7 @@ let test = fn c, d -> {
 		key1: 123,
 		key2: [1,2,3,4,5],
 	};
-	ret c / d;
+	ret 1 + c > d - 5 && true;
 };
 
 # 主函数

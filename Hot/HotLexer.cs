@@ -7,7 +7,7 @@ namespace Hot;
 /// </summary>
 public class HotLexer : IDisposable
 {
-    private static readonly string signs = "+-*/=,:;()[]{}<>";
+    private static readonly string signs = "+-*/&|=,:;()[]{}<>";
 
     private static readonly Dictionary<string, HotToken> keywords = new Dictionary<string, HotToken>()
     {
@@ -166,6 +166,24 @@ public class HotLexer : IDisposable
                 return NewLexeme(HotToken.SignStar, "*");
             case '/':
                 return NewLexeme(HotToken.SignSlash, "/");
+            case '&':
+                c = reader!.Peek();
+                if (c == '&')
+                {
+                    PopChar();
+                    return NewLexeme(HotToken.SignAnd, "&&");
+                }
+                return NewLexeme(HotToken.SignAmpersand, "&");
+            case '|':
+                c = reader!.Peek();
+                if (c == '|')
+                {
+                    PopChar();
+                    return NewLexeme(HotToken.SignOr, "||");
+                }
+                return NewLexeme(HotToken.SignVertical, "|");
+            case '!':
+                return NewLexeme(HotToken.SignExclamation, "!");
             case '=':
                 return NewLexeme(HotToken.SignEqual, "=");
             case ',':

@@ -28,6 +28,9 @@ public enum HotToken
     SignMinus, // -
     SignStar, // *
     SignSlash, // /
+    SignAmpersand, // &
+    SignVertical, // |
+    SignTilde, // ~
     SignEqual, // =
     SignDot, // .
     SignComma, // ,
@@ -43,6 +46,9 @@ public enum HotToken
     SignLessEqual, // <=
     SignGreater, // >
     SignGreaterEqual, // >=
+    SignExclamation, // !
+    SignAnd, // &&
+    SignOr, // ||
     SignArrowLeft, // <-
     SignArrowRight, // ->
 }

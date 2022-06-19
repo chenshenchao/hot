@@ -292,6 +292,12 @@ public class HotParser : IDisposable
             case HotToken.SignMinus:
             case HotToken.SignStar:
             case HotToken.SignSlash:
+            case HotToken.SignGreater:
+            case HotToken.SignGreaterEqual:
+            case HotToken.SignLess:
+            case HotToken.SignLessEqual:
+            case HotToken.SignAnd:
+            case HotToken.SignOr:
                 var operation = PopLexeme();
                 var right = MatchOperand();
                 if (root.Operation is null)

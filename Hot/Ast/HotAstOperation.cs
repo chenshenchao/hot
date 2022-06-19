@@ -10,10 +10,16 @@ public class HotAstOperation : HotAst
 {
     public static readonly Dictionary<HotToken, int> Priorities = new Dictionary<HotToken, int>()
     {
-        { HotToken.SignPlus, 1 },
-        { HotToken.SignMinus, 1 },
-        { HotToken.SignStar, 2 },
-        { HotToken.SignSlash, 2 },
+        { HotToken.SignAnd, 1 },
+        { HotToken.SignOr, 1 },
+        { HotToken.SignGreater, 2 },
+        { HotToken.SignGreaterEqual, 2 },
+        { HotToken.SignLess, 2 },
+        { HotToken.SignLessEqual, 2 },
+        { HotToken.SignPlus, 3 },
+        { HotToken.SignMinus, 3 },
+        { HotToken.SignStar, 4 },
+        { HotToken.SignSlash, 4 },
     };
 
     public static readonly HashSet<HotToken> Rightists = new HashSet<HotToken>();
