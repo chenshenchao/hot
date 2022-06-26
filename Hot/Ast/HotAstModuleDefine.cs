@@ -11,7 +11,7 @@ public class HotAstModuleDefine : HotAst
     public string Name { get; set; } = null!;
     public List<HotAst> Body { get; set; } = null!;
 
-    public override string Explain(int indent)
+    public override string Explain(int indent=0)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(string.Join("", new char[indent].Select(_ => ' ')));

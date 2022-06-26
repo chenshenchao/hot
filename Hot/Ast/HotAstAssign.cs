@@ -16,7 +16,7 @@ public class HotAstAssign : HotAst
         StringBuilder sb = new StringBuilder();
         sb.Append(string.Join("",new char[indent].Select(_ => ' ')));
         sb.AppendLine($"[{Identifier} = ]");
-        sb.Append(Expression!.Explain(indent + 4));
+        sb.AppendLine(Expression!.Explain(indent + 4));
         return sb.ToString();
     }
 }

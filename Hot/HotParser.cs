@@ -29,7 +29,7 @@ public class HotParser : IDisposable
         }
     }
 
-    public HotAst Parse()
+    public HotAstModuleDefine Parse()
     {
         return MatchModuleDefine();
     }
