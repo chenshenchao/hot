@@ -20,6 +20,9 @@ public class HotParser : IDisposable
         lexemes = new List<HotLexeme>();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void Dispose()
     {
         if (lexer != null)
@@ -88,7 +91,9 @@ public class HotParser : IDisposable
 
 
     /// <summary>
-    /// functionDefine ::= 'fn' '(' functionParameters ')' '->' '{' block '}'
+    /// functionDefine ::=
+    ///     'fn' '(' functionParameters ')' '->' '{' block '}'
+    ///     'fn' '(' functionParameters ')' '->' expression
     /// </summary>
     /// <returns></returns>
     private HotAstFunctionDefine MatchFunctionDefine()
@@ -99,12 +104,23 @@ public class HotParser : IDisposable
 
         Match(HotToken.SignArrowRight);
 
-        var body = MatchBlock();
+        var lexeme = PeekLexeme();
+        if (lexeme.Token == HotToken.SignBraceLeft)
+        {
+            var block = MatchBlock();
+            return new HotAstFunctionDefine()
+            {
+                Parameters = parameters,
+                Body = block,
+            };
+        }
+
+        var expression = MatchExpression();
 
         return new HotAstFunctionDefine()
         {
             Parameters = parameters,
-            Body = body,
+            Body = expression,
         };
     }
 

@@ -17,7 +17,7 @@ public class HotInterpreter
         HotAstModuleDefine tree = parser.Parse();
         Console.Write(tree.Explain());
 
-        var assembly = new HotAssembly(tree);
+        //var assembly = new HotAssembly(tree);
         
     }
 }

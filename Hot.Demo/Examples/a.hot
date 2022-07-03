@@ -2,6 +2,7 @@
 
 # use lib;
 
+# 多行块函数定义
 let test = fn c, d -> {
 	let a = [];
 	let b = {};
@@ -13,6 +14,9 @@ let test = fn c, d -> {
 	b = a;
 	ret 1 + c > d - 5 && true;
 };
+
+# 单行表达式函数定义
+let fone = fn a, b -> a + b / a;
 
 # 主函数
 let main = fn args -> {

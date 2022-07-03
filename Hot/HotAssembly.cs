@@ -61,10 +61,10 @@ public class HotAssembly
         );
 
         var generator = method.GetILGenerator();
-        foreach (var s in fd.Body!.Statements)
-        {
+        //foreach (var s in fd.Body!.Statements)
+        //{
 
-        }
+        //}
         return type;
     }
 }

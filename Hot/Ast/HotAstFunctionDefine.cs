@@ -9,7 +9,7 @@ namespace Hot.Ast;
 public class HotAstFunctionDefine : HotAst
 {
     public List<string>? Parameters { get; set; }
-    public HotAstBlock? Body { get; set; }
+    public HotAst? Body { get; set; }
 
     public override string Explain(int indent)
     {
