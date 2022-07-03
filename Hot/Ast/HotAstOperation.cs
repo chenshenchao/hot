@@ -12,6 +12,7 @@ public class HotAstOperation : HotAst
     {
         { HotToken.SignAnd, 1 },
         { HotToken.SignOr, 1 },
+        { HotToken.SignEqual, 2 },
         { HotToken.SignGreater, 2 },
         { HotToken.SignGreaterEqual, 2 },
         { HotToken.SignLess, 2 },

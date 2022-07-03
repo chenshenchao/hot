@@ -12,6 +12,36 @@ let test = fn c, d -> {
 		key2: [1,2,3,4,5],
 	};
 	b = a;
+
+	if d < 0 {
+		d = 110;
+	}
+	else {
+		d = d + 110;
+	}
+
+	if c < 0 {
+		c = 120;
+	}
+	else if c = 0 {
+		if d > 0 {
+			c = c + 10;
+		}
+		c = 100;
+	}
+	else {
+		c = c + 100;
+	}
+
+	#loop i : e {
+	#	a.add(i);
+	#}
+
+	#loop {
+	#	if c > 0 {
+	#		break;
+	#	}
+	#}
 	ret 1 + c > d - 5 && true;
 };
 

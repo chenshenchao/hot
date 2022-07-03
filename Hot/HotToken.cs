@@ -14,6 +14,8 @@ public enum HotToken
     String,
     Identifier,
 
+    KeywordTrue,
+    KeywordFalse,
     KeywordMod,
     KeywordUse,
     KeywordLet,
@@ -21,8 +23,8 @@ public enum HotToken
     KeywordRet,
     KeywordIf,
     KeywordElse,
-    KeywordTrue,
-    KeywordFalse,
+    KeywordLoop,
+    KeywordBreak,
     
     SignPlus, // +
     SignMinus, // -

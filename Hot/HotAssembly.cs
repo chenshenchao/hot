@@ -16,15 +16,19 @@ public class HotAssembly
     public AssemblyBuilder Builder { get; private set; }
     public ModuleBuilder Module { get; private set; }
     public TypeBuilder Main { get; private set; }
-    public Dictionary<string, TypeBuilder> FunctionDefine { get; private set; }
+    public Dictionary<string, TypeBuilder> FunctionDefines { get; private set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="root"></param>
     public HotAssembly(HotAstModuleDefine root)
     {
         Name = new AssemblyName(root.Name);
         Builder = AssemblyBuilder.DefineDynamicAssembly(Name, AssemblyBuilderAccess.RunAndCollect);
         Module = Builder.DefineDynamicModule(root.Name);
         Main = Module.DefineType($"{root.Name}.Main");
-        FunctionDefine = new Dictionary<string, TypeBuilder>();
+        FunctionDefines = new Dictionary<string, TypeBuilder>();
 
         foreach (var s in root.Body)
         {
@@ -33,7 +37,8 @@ public class HotAssembly
                 var vd = s as HotAstVariableDefine;
                 if (vd!.Expression is HotAstFunctionDefine)
                 {
-                    EmitFunctionDefine((vd!.Expression as HotAstFunctionDefine)!);
+                    var b = EmitFunctionDefine((vd!.Expression as HotAstFunctionDefine)!);
+                    b.CreateType();
                 }
                 else
                 {
@@ -41,30 +46,61 @@ public class HotAssembly
                 }
             }
         }
+        Main.CreateType();
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fd"></param>
+    /// <returns></returns>
     private TypeBuilder EmitFunctionDefine(HotAstFunctionDefine fd)
     {
-        var name = $"{Main.FullName}_FC_{FunctionDefine.Count}";
+        // 内部匿名闭包类
+        var name = $"HotClosable__{Main.Name}__{FunctionDefines.Count}";
         var type = Main.DefineNestedType(
             name,
-            TypeAttributes.NestedPrivate | TypeAttributes.Sealed
+            TypeAttributes.NestedPrivate | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit
         );
+        FunctionDefines.Add(name, type);
 
+        // 内部匿名闭包类方法
         var pts = fd!.Parameters!.Select(_ => typeof(object)).ToArray();
         var mname = $"{name}_Method";
         var method = type.DefineMethod(
-            name,
-            MethodAttributes.Public,
+            mname,
+            MethodAttributes.Assembly | MethodAttributes.HideBySig,
             typeof(object),
             pts
         );
 
         var generator = method.GetILGenerator();
-        //foreach (var s in fd.Body!.Statements)
-        //{
+        if (fd.Body is HotAstBlock)
+        {
+            var body = fd.Body as HotAstBlock;
+            foreach (var s in body!.Statements)
+            {
+                if (s is HotAstVariableDefine)
+                {
 
-        //}
+                }
+                else if (s is HotAstReturn)
+                {
+
+                }
+                else if (s is HotAstAssign)
+                {
+
+                }
+            }
+        }
+        else
+        {
+
+        }
+        generator.Emit(OpCodes.Ret);
+
         return type;
     }
 }

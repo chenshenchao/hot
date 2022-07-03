@@ -308,6 +308,7 @@ public class HotParser : IDisposable
             case HotToken.SignMinus:
             case HotToken.SignStar:
             case HotToken.SignSlash:
+            case HotToken.SignEqual:
             case HotToken.SignGreater:
             case HotToken.SignGreaterEqual:
             case HotToken.SignLess:
@@ -438,6 +439,51 @@ public class HotParser : IDisposable
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private HotAstIf MatchIf()
+    {
+        Match(HotToken.KeywordIf);
+        var condition = MatchExpression();
+        var body = MatchBlock();
+        var lexeme = PeekLexeme();
+        HotAst? elseBlock = null;
+        if (lexeme.Token == HotToken.KeywordElse)
+        {
+            Match(HotToken.KeywordElse);
+            lexeme = PeekLexeme();
+            if (lexeme.Token == HotToken.KeywordIf)
+            {
+                elseBlock = MatchIf();
+            }
+            else
+            {
+                elseBlock = MatchBlock();
+            }
+        }
+        return new HotAstIf
+        {
+            Condition = condition,
+            Body = body,
+            ElseBlock = elseBlock,
+        };
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private HotAstLoop MatchLoop()
+    {
+        Match(HotToken.KeywordLoop);
+        return new HotAstLoop
+        {
+
+        };
+    }
+
+    /// <summary>
     /// statement ::=
     ///     variableDefine
     ///     return
@@ -454,6 +500,8 @@ public class HotParser : IDisposable
                 return MatchVariableDefine();
             case HotToken.KeywordRet:
                 return MatchReturn();
+            case HotToken.KeywordIf:
+                return MatchIf();
             case HotToken.Identifier:
                 return MatchAssign();
         }

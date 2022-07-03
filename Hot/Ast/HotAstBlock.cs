@@ -15,7 +15,7 @@ public class HotAstBlock : HotAst
         StringBuilder sb = new StringBuilder();
         foreach (var item in Statements)
         {
-            sb.Append(item.Explain(indent + 4));
+            sb.Append(item.Explain(indent));
         }
         return sb.ToString();
     }
