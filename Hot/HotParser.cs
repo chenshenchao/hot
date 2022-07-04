@@ -246,6 +246,26 @@ public class HotParser : IDisposable
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private HotAstAccess MatchAccess()
+    {
+        var name = Match(HotToken.Identifier);
+        var lexeme = PeekLexeme();
+        var result = new HotAstAccess
+        {
+            Name = (name.Content as string)!,
+        };
+        if (lexeme.Token == HotToken.SignDot)
+        {
+            Match(HotToken.SignDot);
+            result.Access = MatchAccess();
+        }
+        return result;
+    }
+
+    /// <summary>
     /// operand ::=
     ///     true
     ///     false
@@ -258,20 +278,29 @@ public class HotParser : IDisposable
     /// <returns></returns>
     private HotAst MatchOperand()
     {
-        var lexeme = PopLexeme();
+        var lexeme = PeekLexeme();
         switch (lexeme.Token)
         {
             case HotToken.KeywordFalse:
             case HotToken.KeywordTrue:
             case HotToken.Number:
             case HotToken.String:
-            case HotToken.Identifier:
+                lexeme = PopLexeme();
                 return new HotAstOperand
                 {
                     Operand = lexeme,
                 };
+            case HotToken.Identifier:
+                var access = MatchAccess();
+                var p = PeekLexeme();
+                if (p.Token == HotToken.SignParentheseLeft)
+                {
+                    return MatchFunctionCall(access);
+                }
+                return access;
             case HotToken.SignPlus:
             case HotToken.SignMinus:
+                lexeme = PopLexeme();
                 var operand = PopLexeme();
                 return new HotAstOperand
                 {
@@ -279,6 +308,7 @@ public class HotParser : IDisposable
                     Operand = operand,
                 };
             case HotToken.SignParentheseLeft:
+                lexeme = PopLexeme();
                 var expression = MatchExpression();
                 Match(HotToken.SignParentheseRight);
                 return new HotAstOperand
@@ -371,12 +401,6 @@ public class HotParser : IDisposable
             return MatchDictionaryDefine();
         }
 
-        var p2 = PeekLexeme(2);
-        if (p1.Token == HotToken.Identifier && p2.Token == HotToken.SignParentheseLeft)
-        {
-            return MatchFunctionCall();
-        }
-
         return MatchOperation();
     }
 
@@ -404,18 +428,17 @@ public class HotParser : IDisposable
     }
 
     /// <summary>
-    /// functionCall ::= identifier '(' functionArguments ')'
+    /// functionCall ::= access '(' functionArguments ')'
     /// </summary>
     /// <returns></returns>
-    private HotAst MatchFunctionCall()
+    private HotAst MatchFunctionCall(HotAstAccess access)
     {
-        var name = Match(HotToken.Identifier);
         Match(HotToken.SignParentheseLeft);
         var arguments = MatchFunctionArguments();
         Match(HotToken.SignParentheseRight);
         return new HotAstFunctionCall
         {
-            Name = (name.Content as string)!,
+            Access = access,
             Arguments = arguments,
         };
     }
@@ -425,15 +448,14 @@ public class HotParser : IDisposable
     /// </summary>
     /// <returns></returns>
     /// <exception cref="HotException"></exception>
-    private HotAstAssign MatchAssign()
+    private HotAstAssign MatchAssign(HotAstAccess access)
     {
-        var id = Match(HotToken.Identifier);
         Match(HotToken.SignEqual);
         var expression = MatchExpression();
         Match(HotToken.SignSemicolon);
         return new HotAstAssign
         {
-            Identifier = id.Content as string,
+            Access = access,
             Expression = expression,
         };
     }
@@ -503,7 +525,15 @@ public class HotParser : IDisposable
             case HotToken.KeywordIf:
                 return MatchIf();
             case HotToken.Identifier:
-                return MatchAssign();
+                var access = MatchAccess();
+                var p = PeekLexeme();
+                if (p.Token == HotToken.SignEqual)
+                {
+                    return MatchAssign(access);
+                }
+                var call = MatchFunctionCall(access);
+                Match(HotToken.SignSemicolon);
+                return call;
         }
         throw new HotException($"语法错误,不是预期的语句 {lexeme}");
     }

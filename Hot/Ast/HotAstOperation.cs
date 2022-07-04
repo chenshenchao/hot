@@ -21,6 +21,7 @@ public class HotAstOperation : HotAst
         { HotToken.SignMinus, 3 },
         { HotToken.SignStar, 4 },
         { HotToken.SignSlash, 4 },
+        //{ HotToken.SignDot, 5 },
     };
 
     public static readonly HashSet<HotToken> Rightists = new HashSet<HotToken>();

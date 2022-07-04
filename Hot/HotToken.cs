@@ -24,6 +24,7 @@ public enum HotToken
     KeywordIf,
     KeywordElse,
     KeywordLoop,
+    KeywordIn,
     KeywordBreak,
     
     SignPlus, // +

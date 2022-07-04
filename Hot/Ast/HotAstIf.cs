@@ -25,8 +25,16 @@ public class HotAstIf : HotAst
         if (ElseBlock != null)
         {
             sb.Append(head);
-            sb.AppendLine("[else]");
-            sb.AppendLine(ElseBlock!.Explain(indent + 4));
+            if (ElseBlock is HotAstIf)
+            {
+                sb.Append("[else] ");
+                sb.AppendLine(ElseBlock!.Explain(indent));
+            }
+            else
+            {
+                sb.AppendLine("[else]");
+                sb.AppendLine(ElseBlock!.Explain(indent + 4));
+            }
         }
         return sb.ToString();
     }

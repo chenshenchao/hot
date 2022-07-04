@@ -12,6 +12,7 @@ let test = fn c, d -> {
 		key2: [1,2,3,4,5],
 	};
 	b = a;
+	a.add(1234);
 
 	if d < 0 {
 		d = 110;
@@ -33,7 +34,7 @@ let test = fn c, d -> {
 		c = c + 100;
 	}
 
-	#loop i : e {
+	#loop i in e {
 	#	a.add(i);
 	#}
 
