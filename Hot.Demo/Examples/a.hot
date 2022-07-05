@@ -34,15 +34,19 @@ let test = fn c, d -> {
 		c = c + 100;
 	}
 
-	#loop i in e {
-	#	a.add(i);
-	#}
+	loop c > 0 {
+		c = c - 1;
+	}
 
-	#loop {
-	#	if c > 0 {
-	#		break;
-	#	}
-	#}
+	loop i in e {
+		a.add(i);
+	}
+
+	loop {
+		if c > 0 {
+			break;
+		}
+	}
 	ret 1 + c > d - 5 && true;
 };
 

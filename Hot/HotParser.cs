@@ -499,9 +499,43 @@ public class HotParser : IDisposable
     private HotAstLoop MatchLoop()
     {
         Match(HotToken.KeywordLoop);
+
+        var p1 = PeekLexeme();
+
+        // loop
+        if (p1.Token == HotToken.SignBraceLeft)
+        {
+            var body = MatchBlock();
+            return new HotAstLoop
+            {
+                Body = body,
+            };
+        }
+
+        // loop in
+        var p2 = PeekLexeme(2);
+        if (p1.Token == HotToken.Identifier && p2.Token == HotToken.KeywordIn)
+        {
+            var iterator = Match(HotToken.Identifier);
+            Match(HotToken.KeywordIn);
+            var collection = MatchOperation();
+            var body = MatchBlock();
+            return new HotAstLoop
+            {
+                Iterator = (iterator.Content as string)!,
+                Collection = collection,
+                Body = body,
+            };
+        }
+
+        // loop condition
+        var condition = MatchOperation();
+        var block = MatchBlock();
+
         return new HotAstLoop
         {
-
+            Condition = condition,
+            Body = block,
         };
     }
 
@@ -524,6 +558,12 @@ public class HotParser : IDisposable
                 return MatchReturn();
             case HotToken.KeywordIf:
                 return MatchIf();
+            case HotToken.KeywordLoop:
+                return MatchLoop();
+            case HotToken.KeywordBreak:
+                Match(HotToken.KeywordBreak);
+                Match(HotToken.SignSemicolon);
+                return new HotAstBreak();
             case HotToken.Identifier:
                 var access = MatchAccess();
                 var p = PeekLexeme();

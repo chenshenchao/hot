@@ -21,6 +21,7 @@ public class HotLexer : IDisposable
         { "if", HotToken.KeywordIf },
         { "else", HotToken.KeywordElse },
         { "loop", HotToken.KeywordLoop },
+        { "in", HotToken.KeywordIn },
         { "break", HotToken.KeywordBreak },
     };
 
