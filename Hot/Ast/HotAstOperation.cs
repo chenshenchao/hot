@@ -21,7 +21,6 @@ public class HotAstOperation : HotAst
         { HotToken.SignMinus, 3 },
         { HotToken.SignStar, 4 },
         { HotToken.SignSlash, 4 },
-        //{ HotToken.SignDot, 5 },
     };
 
     public static readonly HashSet<HotToken> Rightists = new HashSet<HotToken>();
@@ -73,6 +72,20 @@ public class HotAstOperation : HotAst
         return root;
     }
 
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append(' ');
+        sb.Append(Left!.ToString());
+        sb.Append(' ');
+        sb.Append(Operation!.Content as string);
+        sb.Append(' ');
+        sb.Append(Right!.ToString());
+        sb.Append(' ');
+
+        return sb.ToString();
+    }
 
     /// <summary>
     /// 

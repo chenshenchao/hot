@@ -44,7 +44,7 @@ public class HotParser : IDisposable
     private HotAstModuleDefine MatchModuleDefine()
     {
         Match(HotToken.KeywordMod);
-        var id = Match(HotToken.Identifier);
+        var name = MatchAccess();
         Match(HotToken.SignSemicolon);
 
         var body = new List<HotAst>();
@@ -60,7 +60,7 @@ public class HotParser : IDisposable
 
         return new HotAstModuleDefine
         {
-            Name = (id.Content as string)!,
+            Name = name,
             Body = body,
         };
     }
@@ -246,10 +246,10 @@ public class HotParser : IDisposable
     }
 
     /// <summary>
-    /// 
+    /// access ::= identifier accessLocator* ('.' identifier)*
     /// </summary>
     /// <returns></returns>
-    private HotAstAccess MatchAccess()
+    private HotAstAccess MatchAccess(bool locable = false)
     {
         var name = Match(HotToken.Identifier);
         var lexeme = PeekLexeme();
@@ -257,10 +257,40 @@ public class HotParser : IDisposable
         {
             Name = (name.Content as string)!,
         };
+
+        if (locable)
+        {
+            if (lexeme.Token == HotToken.SignBracketLeft)
+            {
+                result.Locator = MatchAccessLocator();
+                lexeme = PeekLexeme();
+            }
+        }
+
         if (lexeme.Token == HotToken.SignDot)
         {
             Match(HotToken.SignDot);
-            result.Access = MatchAccess();
+            result.Access = MatchAccess(locable);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// accessLocator ::= ('[' expression ']')+
+    /// </summary>
+    /// <returns></returns>
+    private HotAstAccessLocator MatchAccessLocator()
+    {
+        var result = new HotAstAccessLocator();
+        Match(HotToken.SignBracketLeft);
+        result.Expression = MatchExpression();
+        Match(HotToken.SignBracketRight);
+
+        var lexeme = PeekLexeme();
+        if (lexeme.Token == HotToken.SignBracketLeft)
+        {
+            result.Locator = MatchAccessLocator();
         }
         return result;
     }
@@ -291,7 +321,7 @@ public class HotParser : IDisposable
                     Operand = lexeme,
                 };
             case HotToken.Identifier:
-                var access = MatchAccess();
+                var access = MatchAccess(true);
                 var p = PeekLexeme();
                 if (p.Token == HotToken.SignParentheseLeft)
                 {
@@ -565,7 +595,7 @@ public class HotParser : IDisposable
                 Match(HotToken.SignSemicolon);
                 return new HotAstBreak();
             case HotToken.Identifier:
-                var access = MatchAccess();
+                var access = MatchAccess(true);
                 var p = PeekLexeme();
                 if (p.Token == HotToken.SignEqual)
                 {

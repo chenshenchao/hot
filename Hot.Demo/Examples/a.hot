@@ -1,18 +1,22 @@
-﻿mod main;
+﻿mod HotDemo.Main;
 
 # use lib;
 
 # 多行块函数定义
-let test = fn c, d -> {
+let TestFunc = fn c, d -> {
 	let a = [];
 	let b = {};
 	let e = [1,2,3,10.2 + 4];
 	let f = {
 		key1: 123,
 		key2: [1,2,3,4,5],
+		func: fn a -> a + 100,
 	};
 	b = a;
 	a.add(1234);
+
+	let g = a[0];
+	e[2] = 20;
 
 	if d < 0 {
 		d = 110;
@@ -51,10 +55,10 @@ let test = fn c, d -> {
 };
 
 # 单行表达式函数定义
-let fone = fn a, b -> a + b / a;
+let FuncOne = fn a, b -> a + b / a;
 
 # 主函数
-let main = fn args -> {
+let Main = fn args -> {
 	let a = 123.4;
 	let b = 123.5;
 	let c = test(a,b);

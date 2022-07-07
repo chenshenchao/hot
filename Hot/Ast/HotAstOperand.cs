@@ -14,6 +14,35 @@ public class HotAstOperand : HotAst
     public HotLexeme? Sign { get; set; }
     public HotLexeme? Operand { get; set; }
     public HotAst? Expression { get; set; }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        if (Sign != null)
+        {
+            sb.Append(' ');
+            sb.Append(Sign.Content);
+            sb.Append(' ');
+        }
+
+        if (Operand != null)
+        {
+            sb.Append(' ');
+            sb.Append(Operand.Content);
+            sb.Append(' ');
+        }
+
+        if (Expression != null)
+        {
+            sb.Append(' ');
+            sb.Append(Expression.ToString());
+            sb.Append(' ');
+        }
+
+        return sb.ToString();
+    }
+
     public override string Explain(int indent)
     {
         StringBuilder sb = new StringBuilder();

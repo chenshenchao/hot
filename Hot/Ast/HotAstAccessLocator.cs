@@ -6,27 +6,23 @@ using System.Threading.Tasks;
 
 namespace Hot.Ast;
 
-public class HotAstAccess : HotAst
+public class HotAstAccessLocator : HotAst
 {
-    public string Name { get; set; } = null!;
+    public HotAst Expression { get; set; } = null!;
 
     public HotAstAccessLocator? Locator { get; set; }
-    public HotAstAccess? Access { get; set; }
 
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.Append(Name);
+
+        sb.Append('[');
+        sb.Append(Expression.ToString());
+        sb.Append(']');
 
         if (Locator != null)
         {
             sb.Append(Locator.ToString());
-        }
-
-        if (Access != null)
-        {
-            sb.Append('.');
-            sb.Append(Access.ToString());
         }
 
         return sb.ToString();
@@ -36,10 +32,17 @@ public class HotAstAccess : HotAst
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.Append(string.Join("", new char[indent].Select(_ => ' ')));
-        sb.Append("[access ");
-        sb.Append(ToString());
-        sb.Append("]");
+        var head = string.Join("", new char[indent].Select(_ => ' '));
+        sb.Append(head);
+        sb.AppendLine("[location begin");
+        sb.Append(Expression.Explain(indent + 4));
+        sb.Append(head);
+        sb.AppendLine("]");
+
+        if (Locator != null)
+        {
+            sb.Append(Locator.Explain(indent));
+        }
 
         return sb.ToString();
     }

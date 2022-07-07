@@ -24,9 +24,10 @@ public class HotAssembly
     /// <param name="root"></param>
     public HotAssembly(HotAstModuleDefine root)
     {
-        Name = new AssemblyName(root.Name);
+        var name = root.Name.ToString();
+        Name = new AssemblyName(name);
         Builder = AssemblyBuilder.DefineDynamicAssembly(Name, AssemblyBuilderAccess.RunAndCollect);
-        Module = Builder.DefineDynamicModule(root.Name);
+        Module = Builder.DefineDynamicModule(name);
         Main = Module.DefineType($"{root.Name}.Main");
         FunctionDefines = new Dictionary<string, TypeBuilder>();
 
@@ -102,5 +103,19 @@ public class HotAssembly
         generator.Emit(OpCodes.Ret);
 
         return type;
+    }
+
+    private void EmitVariableDefine(HotAstVariableDefine vd)
+    {
+
+    }
+
+    private void EmitOperation(HotAstOperation operation)
+    {
+
+        if (operation is HotAstOperation)
+        {
+
+        }
     }
 }
