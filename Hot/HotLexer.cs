@@ -336,10 +336,7 @@ public class HotLexer : IDisposable
         if (c == '\r')
         {
             int n = reader.Peek();
-            if (n == '\n')
-            {
-                c = reader.Read();
-            }
+            c = n == '\n' ? reader.Read() : '\n';
         }
 
         // 换行处理
